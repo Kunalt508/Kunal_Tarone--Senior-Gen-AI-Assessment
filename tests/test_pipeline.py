@@ -176,6 +176,15 @@ def benchmark_engine():
 
 
 def _jaccard(set_a: set, set_b: set) -> float:
+    """Jaccard overlap: |A ∩ B| / |A ∪ B|, ranges 0 (disjoint) to 1 (identical).
+
+    In retrieval benchmarks this measures how much two result sets agree
+    regardless of ranking.  A low score means the strategies surface
+    different documents (complementary); a high score means they largely
+    agree.  Unlike rank-aware metrics (MRR, nDCG) Jaccard treats the
+    result set as unordered — useful for judging *what* was retrieved,
+    not *in what order*.
+    """
     if not set_a and not set_b:
         return 1.0
     return len(set_a & set_b) / len(set_a | set_b)

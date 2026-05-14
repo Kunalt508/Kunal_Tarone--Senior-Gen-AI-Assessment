@@ -1,0 +1,76 @@
+Modern cloud applications adjust their compute footprint dynamically in
+response to changing demand. Horizontal scaling adds or removes identical
+service instances behind a load balancer, while vertical scaling resizes
+the resources of a single instance. Reactive policies trigger on threshold
+breaches such as sustained CPU above seventy percent, whereas predictive
+policies use historical traffic patterns and machine learning forecasts
+to provision capacity before demand arrives. Effective autoscaling depends
+on fast instance startup, stateless service design, and warm pools that
+keep pre-initialized capacity ready to absorb sudden bursts without
+cold-start latency.
+
+A load balancer distributes incoming network traffic across a pool of
+backend instances to maximize throughput and minimize response time. Layer
+4 balancers operate on TCP connections and route based on IP and port,
+while Layer 7 balancers inspect HTTP headers, paths, and cookies to make
+content-aware routing decisions. Common algorithms include round-robin
+for uniform distribution, least-connections for unevenly-sized workloads,
+and consistent hashing for session affinity. Health checks remove failing
+instances from the rotation automatically, and weighted routing supports
+gradual traffic shifts during deployments or canary releases.
+
+Caching reduces latency and backend load by storing the results of
+expensive operations closer to the consumer. Content delivery networks
+cache static assets at edge locations geographically near end users,
+in-memory caches such as Redis or Memcached hold frequently accessed
+query results within microseconds of the application tier, and HTTP
+caches respect directives like max-age and ETag for conditional requests.
+The hard problem is invalidation: write-through, write-behind, and
+time-to-live strategies each trade freshness against performance. A
+well-tuned cache hierarchy can absorb the majority of read traffic and
+dramatically reduce database pressure during traffic spikes.
+
+When a single database instance cannot serve the required read or write
+throughput, the data is partitioned across multiple nodes. Sharding
+splits rows horizontally by a key such as user ID or geographic region
+so that each shard owns a disjoint slice of the dataset. Replication
+maintains copies of each shard across multiple nodes, providing fault
+tolerance and the ability to serve reads from replicas. Replication can
+be synchronous, where writes block until acknowledged by replicas, or
+asynchronous, which is faster but allows replicas to lag. Consistency
+models range from strong to eventual, each with different guarantees
+about what a reader observes after a write.
+
+When a downstream dependency becomes slow or unavailable, naive clients
+retry aggressively and amplify the failure into a cascading outage. A
+circuit breaker monitors the error rate of outgoing calls and trips open
+after a threshold is exceeded, short-circuiting subsequent requests with
+a fast failure instead of waiting for timeouts. After a cooldown the
+breaker enters a half-open state and probes the dependency with a small
+number of test requests before closing again. Combined with bounded
+retries, exponential backoff with jitter, and per-call timeouts, this
+pattern isolates failures and preserves overall system resilience even
+when individual services degrade.
+
+Observability is the ability to understand the internal state of a
+running system from its external outputs. Metrics provide aggregated
+numerical signals such as request rate, error rate, and latency
+percentiles, sampled at regular intervals and stored in time-series
+databases for alerting and dashboards. Structured logs record discrete
+events with contextual fields useful for forensic investigation of
+specific incidents. Distributed traces follow a single request across
+service boundaries, recording the latency and outcome of each span so
+engineers can pinpoint where time is being spent. Together these three
+pillars allow operators to detect, diagnose, and resolve issues in
+complex distributed deployments.
+
+A message queue decouples producers from consumers by accepting work
+items into a durable buffer that consumers process at their own pace.
+This smooths bursty traffic, isolates failures so that a slow consumer
+does not block the producer, and enables reliable retry of failed work
+through dead-letter queues. Brokers such as Kafka, RabbitMQ, and SQS
+offer different trade-offs in ordering guarantees, throughput, and
+delivery semantics, ranging from at-most-once to exactly-once.
+Asynchronous designs are essential for workloads like email dispatch,
+video transcoding, and analytics ingestion, where the user does not need
+to wait for completion.
